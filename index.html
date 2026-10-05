@@ -3,42 +3,261 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glyde · Legal</title>
+<title>Glyde: diabetes food scanner</title>
+<meta name="description" content="Snap your plate and see the carbs and your likely blood sugar spike before you eat. Simple swaps for any cuisine. No CGM needed.">
+<meta property="og:title" content="Glyde: see your spike risk before you eat">
+<meta property="og:description" content="Carbs, spike risk and simple swaps from a photo, a barcode, your voice or a few words. For people with diabetes, worldwide.">
+<meta property="og:image" content="img/01-result.jpg">
+<link rel="icon" href="img/icon.png">
+<link rel="apple-touch-icon" href="img/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root { --ink: #0F172A; --grey: #64748B; --blue: #1D4ED8; --tint: #EEF2FF; --page: #F5F6F8; --card: #FFFFFF; --line: #E5E7EB; }
+:root {
+  --blue: #1D4ED8; --blue-dark: #1E40AF; --tint: #DBEAFE; --ink: #0F172A; --grey: #64748B;
+  --page: #F5F6F8; --card: #FFFFFF; --line: #E5E7EB; --on-blue: #FFFFFF; --on-blue-soft: rgba(255,255,255,0.78);
+  --low: #16A34A; --medium: #D97706; --high: #DC2626;
+}
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--page); color: var(--ink); font: 400 16px/1.6 'DM Sans', system-ui, sans-serif; }
-main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
-.card { background: var(--card); border-radius: 24px; padding: 32px 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
-header { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
-header .drop { width: 24px; height: 28px; }
-header span { font-weight: 700; font-size: 22px; letter-spacing: -0.4px; }
-nav { display: flex; gap: 16px; margin: 0 0 24px; }
-nav a { color: var(--blue); font-weight: 600; text-decoration: none; }
-h1 { font-size: 32px; line-height: 1.2; letter-spacing: -0.8px; margin: 0 0 8px; }
-h2 { font-size: 20px; margin: 32px 0 8px; }
-p, li { color: var(--ink); }
-em { color: var(--grey); font-style: normal; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 17px/1.6 'DM Sans', system-ui, sans-serif; }
+img { max-width: 100%; display: block; }
 a { color: var(--blue); }
-ul { padding-left: 20px; }
-hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
-th, td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--grey); font-weight: 600; }
-footer { color: var(--grey); font-size: 14px; text-align: center; margin-top: 24px; }
-@media (max-width: 480px) { .card { padding: 24px 16px; } h1 { font-size: 28px; } table { font-size: 14px; } }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+.top { position: sticky; top: 0; z-index: 10; background: rgba(245,246,248,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: 22px; letter-spacing: -0.4px; }
+.brand img { width: 34px; height: 34px; border-radius: 9px; }
+.top nav { display: flex; gap: 20px; }
+.top nav a { color: var(--ink); text-decoration: none; font-weight: 500; font-size: 15px; }
+
+/* Hero */
+.hero { background: var(--blue); color: var(--on-blue); border-radius: 0 0 40px 40px; overflow: hidden; }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items: center; padding-top: 64px; padding-bottom: 0; }
+.hero h1 { font-size: 56px; line-height: 1.05; letter-spacing: -2px; margin: 0 0 20px; }
+.hero p.lead { font-size: 20px; color: var(--on-blue-soft); margin: 0 0 32px; max-width: 480px; }
+.cta { display: inline-flex; align-items: center; gap: 10px; background: var(--on-blue); color: var(--blue); font-weight: 700; padding: 16px 26px; border-radius: 999px; text-decoration: none; font-size: 17px; }
+.cta[aria-disabled="true"] { cursor: default; }
+.cta svg { width: 20px; height: 20px; }
+.hero .small { margin: 14px 0 64px; color: var(--on-blue-soft); font-size: 15px; }
+.hero .phone { align-self: end; justify-self: center; width: 100%; max-width: 360px; }
+.hero .phone img { border-radius: 28px 28px 0 0; box-shadow: 0 -10px 60px rgba(0,0,0,0.25); }
+
+/* Sections */
+section { padding: 88px 0 0; }
+.kicker { color: var(--blue); font-weight: 700; font-size: 14px; letter-spacing: 0.4px; text-transform: uppercase; margin: 0 0 10px; }
+h2 { font-size: 40px; line-height: 1.12; letter-spacing: -1.2px; margin: 0 0 16px; }
+.sub { color: var(--grey); font-size: 19px; max-width: 620px; margin: 0 0 40px; }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.step { background: var(--card); border-radius: 24px; padding: 28px 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
+.step .n { width: 36px; height: 36px; border-radius: 50%; background: var(--tint); color: var(--blue); font-weight: 700; display: grid; place-items: center; margin-bottom: 16px; }
+.step h3 { margin: 0 0 6px; font-size: 20px; letter-spacing: -0.3px; }
+.step p { margin: 0; color: var(--grey); font-size: 16px; }
+.risk { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.risk span { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--page); }
+.risk i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+.shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.shots img { border-radius: 22px; box-shadow: 0 10px 30px rgba(15,23,42,0.12); }
+
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.feature { background: var(--card); border-radius: 24px; padding: 26px 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
+.feature .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--tint); display: grid; place-items: center; margin-bottom: 14px; }
+.feature .ico svg { width: 22px; height: 22px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.feature h3 { margin: 0 0 6px; font-size: 18px; }
+.feature p { margin: 0; color: var(--grey); font-size: 16px; }
+
+.band { background: var(--card); border-radius: 32px; padding: 48px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
+.band ul { list-style: none; padding: 0; margin: 0; }
+.band li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; }
+.band li:last-child { border-bottom: 0; }
+.band li svg { flex: none; width: 22px; height: 22px; stroke: var(--blue); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; }
+
+.plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.plan { background: var(--card); border-radius: 24px; padding: 26px 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); position: relative; }
+.plan.best { outline: 2px solid var(--blue); }
+.plan .tag { position: absolute; top: -12px; right: 20px; background: var(--blue); color: var(--on-blue); font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+.plan h3 { margin: 0 0 4px; font-size: 18px; }
+.plan .price { font-size: 34px; font-weight: 700; letter-spacing: -1px; }
+.plan .price small { font-size: 16px; color: var(--grey); font-weight: 500; letter-spacing: 0; }
+.plan p { margin: 6px 0 0; color: var(--grey); font-size: 15px; }
+.fine { color: var(--grey); font-size: 14px; margin-top: 16px; }
+
+.faq details { background: var(--card); border-radius: 20px; padding: 20px 24px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
+.faq summary { font-weight: 600; cursor: pointer; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--blue); font-weight: 700; font-size: 22px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { color: var(--grey); margin: 12px 0 0; font-size: 16px; }
+
+.support { background: var(--blue); color: var(--on-blue); border-radius: 32px; padding: 48px 40px; text-align: center; }
+.support h2 { color: var(--on-blue); }
+.support p { color: var(--on-blue-soft); margin: 0 0 24px; }
+
+footer { padding: 64px 0 40px; color: var(--grey); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+footer a { color: var(--grey); }
+.disclaimer { max-width: 620px; }
+
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: 1fr; padding-top: 40px; text-align: center; }
+  .hero h1 { font-size: 42px; letter-spacing: -1.4px; }
+  .hero p.lead { margin-left: auto; margin-right: auto; font-size: 18px; }
+  .hero .small { margin-bottom: 32px; }
+  .hero .phone { max-width: 280px; }
+  .steps, .features, .plans { grid-template-columns: 1fr; }
+  .shots { grid-template-columns: repeat(2, 1fr); }
+  .band { grid-template-columns: 1fr; padding: 32px 22px; }
+  .support { padding: 40px 22px; }
+  h2 { font-size: 32px; }
+  section { padding-top: 64px; }
+  .plans { gap: 22px; }
+}
+@media (max-width: 480px) {
+  .wrap { padding: 0 16px; }
+  .top nav a.hide-sm { display: none; }
+  .hero h1 { font-size: 36px; }
+}
 </style>
 </head>
 <body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="img/icon.png" alt="" width="34" height="34">Glyde</a>
+    <nav>
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#pricing">Pricing</a>
+      <a href="#support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <h1>See your spike risk before you eat.</h1>
+      <p class="lead">Snap your plate and Glyde shows the carbs, how likely the meal is to spike your blood sugar, and simple swaps that make it gentler. No CGM needed.</p>
+      <!-- When the app is live: set href to the App Store link and remove aria-disabled. -->
+      <a class="cta" id="app-store" href="#support" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.89-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.79 1.3 10.34.86 1.25 1.89 2.65 3.24 2.6 1.3-.05 1.79-.84 3.36-.84 1.57 0 2.01.84 3.38.81 1.4-.02 2.29-1.27 3.14-2.52.99-1.45 1.4-2.85 1.42-2.92-.03-.01-2.72-1.04-2.75-4.14zM13.79 4.97c.72-.87 1.2-2.07 1.07-3.27-1.03.04-2.28.69-3.02 1.55-.66.77-1.24 2-1.09 3.18 1.15.09 2.32-.58 3.04-1.46z"/></svg>
+        Coming soon on the App Store
+      </a>
+      <p class="small">For iPhone. Android coming later.</p>
+    </div>
+    <div class="phone"><img src="img/01-result.jpg" alt="Glyde results: carbs per food, spike risk and the estimated 2-hour curve" width="600" height="1304"></div>
+  </div>
+</div>
+
 <main>
-<header><svg class="drop" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1C12 1 2 12.5 2 18.5a10 10 0 0 0 20 0C22 12.5 12 1 12 1Z" fill="#1D4ED8"/></svg><span>Glyde</span></header>
-<nav><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of use</a></nav>
-<article class="card">
-<h1>Glyde</h1><p>An app that helps people understand how food affects their blood sugar.</p><ul><li><a href="privacy.html">Privacy policy</a></li><li><a href="terms.html">Terms of use</a></li></ul><p>Support: <a href="mailto:glydeapp202@gmail.com">glydeapp202@gmail.com</a></p>
-</article>
-<footer>Glyde gives estimates, not medical advice.</footer>
+  <section id="how">
+    <div class="wrap">
+      <p class="kicker">How it works</p>
+      <h2>A smarter plate in seconds</h2>
+      <p class="sub">Glyde estimates the carbs and the likely blood sugar spike from the food alone. No meter, no sensor, no counting.</p>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><h3>Add your meal</h3><p>Take a photo, scan a barcode, say what you ate or type it. Any cuisine works.</p></div>
+        <div class="step"><div class="n">2</div><h3>See your spike risk</h3><p>Carbs per food and in total, a clear spike risk with the reason, and the shape of the next two hours.</p>
+          <div class="risk"><span><i style="background:var(--low)"></i>Low</span><span><i style="background:var(--medium)"></i>Medium</span><span><i style="background:var(--high)"></i>High</span></div></div>
+        <div class="step"><div class="n">3</div><h3>Make it gentler</h3><p>Two or three practical swaps for every meal, like half the rice or vegetables first. Watch the curve redraw.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shots">
+        <img src="img/01-result.jpg" alt="Meal results with spike risk" width="600" height="1304" loading="lazy">
+        <img src="img/03-result-swaps.jpg" alt="Swaps that lower the spike" width="600" height="1304" loading="lazy">
+        <img src="img/05-voice.jpg" alt="Say what you ate" width="600" height="1304" loading="lazy">
+        <img src="img/06-coach.jpg" alt="The Glyde food coach" width="600" height="1304" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="kicker">Everything in one place</p>
+      <h2>Built for real meals, from everywhere</h2>
+      <p class="sub">From jollof rice and injera to pho, biryani and arepas. Tell Glyde your cuisines and it learns your dishes and portions.</p>
+      <div class="features">
+        <div class="feature"><div class="ico"><svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div><h3>Photo scan</h3><p>Point, shoot, done. Every food on the plate, counted.</p></div>
+        <div class="feature"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 5v14M8 5v14M12 5v14M17 5v14M21 5v14"/></svg></div><h3>Barcode scan</h3><p>Packaged food with the label's real nutrition values.</p></div>
+        <div class="feature"><div class="ico"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></div><h3>Say it</h3><p>Voice logging that understands dish names.</p></div>
+        <div class="feature"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h3>Food coach</h3><p>Short, specific answers that know what you've eaten today.</p></div>
+        <div class="feature"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></div><h3>Patterns</h3><p>A daily spike score, a monthly heatmap and the foods that spike you most.</p></div>
+        <div class="feature"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Private by design</h3><p>Your meals, photos and chats stay on your phone.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="band">
+        <div>
+          <p class="kicker">Why Glyde</p>
+          <h2>The same meal can spike you differently</h2>
+          <p class="sub" style="margin-bottom:0">Continuous glucose monitors are expensive and most people with diabetes don't have one. Glyde gives you a useful read on every meal from the food alone, so small changes add up.</p>
+        </div>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>No sensor or meter needed</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Type 1, type 2 and prediabetes</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Dishes from cuisines around the world</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Never gives medication or insulin advice</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Delete your account and data anytime</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <p class="kicker">Pricing</p>
+      <h2>Start with 3 days free</h2>
+      <p class="sub">Try everything free for 3 days on the yearly plan. Cancel anytime in your iPhone's Settings.</p>
+      <div class="plans">
+        <div class="plan best"><span class="tag">Best value</span><h3>Yearly</h3><div class="price">$39.99 <small>/ year</small></div><p>3-day free trial, then about $0.77 a week</p></div>
+        <div class="plan"><h3>Monthly</h3><div class="price">$9.99 <small>/ month</small></div><p>Billed every month</p></div>
+        <div class="plan"><h3>Weekly</h3><div class="price">$2.99 <small>/ week</small></div><p>Billed every week</p></div>
+      </div>
+      <p class="fine">Prices in US dollars; the App Store shows your local price. Subscriptions renew automatically unless cancelled at least 24 hours before the end of the trial or period.</p>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="wrap">
+      <p class="kicker">Questions</p>
+      <h2>Good to know</h2>
+      <details><summary>Is Glyde a medical device?</summary><p>No. Glyde gives AI estimates from the food you scan or describe. It doesn't measure blood sugar, diagnose or treat anything, and never gives medication or insulin advice. Always follow your doctor or diabetes care team.</p></details>
+      <details><summary>Do I need a CGM or glucose meter?</summary><p>No. Glyde works from the food alone, so you get a read on every meal without any hardware.</p></details>
+      <details><summary>How accurate are the estimates?</summary><p>Glyde uses standard carb values for foods from around the world. Portions from a photo are estimates, so you can change any food's amount or fix the result in your own words and the numbers update instantly.</p></details>
+      <details><summary>Does it work with my food?</summary><p>Yes. Glyde recognises dishes from many cuisines and learns the ones you choose during setup.</p></details>
+      <details><summary>What happens to my data?</summary><p>Your meals, photos and chats stay on your phone. Photos, voice notes and messages are analysed by our AI providers and not kept. You can delete your account and all data from the app at any time. Read the <a href="privacy.html">privacy policy</a>.</p></details>
+      <details><summary>How do I cancel?</summary><p>In your iPhone's Settings, tap your name, then Subscriptions, then Glyde. Or open Glyde, go to Profile and tap Manage subscription.</p></details>
+    </div>
+  </section>
+
+  <section id="support">
+    <div class="wrap">
+      <div class="support">
+        <h2>Support</h2>
+        <p>Questions, feedback or a problem with the app? Email us and we'll get back to you.</p>
+        <a class="cta" href="mailto:glydeapp202@gmail.com">glydeapp202@gmail.com</a>
+      </div>
+    </div>
+  </section>
 </main>
+
+<footer>
+  <div class="wrap">
+    <p class="disclaimer">Glyde gives estimates, not medical advice. It is not a medical device. Check with your doctor before making medical decisions.</p>
+    <nav><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of use</a><a href="mailto:glydeapp202@gmail.com">Contact</a></nav>
+  </div>
+</footer>
+
 </body>
 </html>
