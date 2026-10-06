@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Glyde dashboard</title>
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #F6F5F2; --card: #FFFFFF; --surface: #F3F2EE; --line: #E9E6DF;
+  --ink: #0A0F1C; --body: #4B5466; --muted: #8A93A6;
+  --blue: #1D4ED8; --blue-soft: #C9D7FB; --tint: #EEF3FF;
+  --good: #16A34A; --good-bg: #E7F7EE; --warn: #A76505; --warn-bg: #FEF3DC; --bad: #B42323; --bad-bg: #FDE8E8;
+  --shadow: 0 1px 2px rgba(10,15,28,.04), 0 8px 24px rgba(10,15,28,.05);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 15px/1.5 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 64px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+.brand img { width: 32px; height: 32px; border-radius: 9px; }
+.brand span { color: var(--muted); font-weight: 500; }
+.meta { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; flex-wrap: wrap; }
+button { font: inherit; cursor: pointer; }
+.btn { height: 38px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--ink); color: #fff; font-weight: 600; font-size: 14px; }
+.btn.ghost { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.banner { display: flex; gap: 12px; align-items: flex-start; padding: 14px 18px; border-radius: 18px; margin-bottom: 16px; font-size: 14px; }
+.banner.warn { background: var(--warn-bg); color: #6B4304; }
+.banner.bad { background: var(--bad-bg); color: #7A1515; }
+.banner b { display: block; margin-bottom: 2px; }
+.banner svg { flex: none; width: 20px; height: 20px; margin-top: 1px; }
+.grid { display: grid; gap: 12px; }
+.kpis { grid-template-columns: repeat(6, 1fr); margin-bottom: 12px; }
+.card { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 20px; min-width: 0; }
+.kpi .label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.kpi .value { font-size: 34px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; margin-top: 6px; }
+.kpi .sub { font-size: 13px; color: var(--body); margin-top: 4px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.good { color: var(--good); background: var(--good-bg); } .chip.warn { color: var(--warn); background: var(--warn-bg); } .chip.bad { color: var(--bad); background: var(--bad-bg); }
+.two { grid-template-columns: 1fr 1fr; margin-bottom: 12px; }
+.three { grid-template-columns: 1fr 1fr 1fr; margin-bottom: 12px; }
+h2 { margin: 0 0 4px; font-size: 16px; letter-spacing: -0.01em; }
+.hint { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: 190px; overflow: visible; }
+.chart .axis { font: 500 11px 'DM Sans', sans-serif; fill: var(--muted); }
+.chart rect.bar { fill: var(--blue); transition: fill .15s; }
+.chart rect.bar.today { fill: var(--blue); }
+.chart rect.hit { fill: transparent; cursor: pointer; outline: none; }
+.chart rect.hit:hover + rect.bar, .chart rect.hit:focus + rect.bar { fill: #3B6CF0; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; border-radius: 12px; padding: 8px 12px; font-size: 12.5px; line-height: 1.45; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity .12s; z-index: 5; }
+.tip.on { opacity: 1; }
+.tip b { font-weight: 700; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 0 8px 8px 0; }
+td { padding: 9px 8px 9px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+td.num, th.num { text-align: right; }
+.hbar { display: grid; grid-template-columns: minmax(90px, 1.2fr) 2fr auto; gap: 10px; align-items: center; padding: 7px 0; font-size: 14px; }
+.hbar .track { height: 8px; border-radius: 4px; background: var(--surface); overflow: hidden; }
+.hbar .fill { height: 100%; border-radius: 4px; background: var(--blue); }
+.hbar .n { font-variant-numeric: tabular-nums; color: var(--body); min-width: 28px; text-align: right; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; background: var(--surface); color: var(--ink); text-decoration: none; font-weight: 600; font-size: 13.5px; }
+.links a:hover { background: var(--tint); color: var(--blue); }
+.login { max-width: 420px; margin: 12vh auto; text-align: center; }
+.login input { width: 100%; height: 48px; border-radius: 14px; border: 1px solid var(--line); padding: 0 16px; font: inherit; margin: 16px 0 12px; background: #fff; }
+.skeleton { background: linear-gradient(90deg, var(--surface), #fff, var(--surface)); background-size: 200% 100%; animation: sh 1.2s linear infinite; border-radius: 10px; height: 18px; }
+@keyframes sh { to { background-position: -200% 0; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 1000px) { .kpis { grid-template-columns: repeat(3, 1fr); } .three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 680px) { .kpis { grid-template-columns: repeat(2, 1fr); } .two, .three { grid-template-columns: 1fr; } .kpi .value { font-size: 28px; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="login card" id="login" hidden>
+    <img src="img/icon.png" alt="" width="48" height="48" style="border-radius:13px;margin:0 auto">
+    <h2 style="margin-top:14px">Glyde dashboard</h2>
+    <p class="hint">Enter your dashboard key. It's saved on this device only.</p>
+    <form id="login-form"><input id="key" type="password" autocomplete="current-password" placeholder="Dashboard key" aria-label="Dashboard key" required><button class="btn" style="width:100%;height:46px">Open dashboard</button></form>
+    <p class="hint" id="login-error" style="color:var(--bad)"></p>
+  </div>
+
+  <div id="dash" hidden>
+    <header>
+      <div class="brand"><img src="img/icon.png" alt="" width="32" height="32">Glyde <span>dashboard</span></div>
+      <div class="meta"><span id="updated">Loading…</span><button class="btn ghost" id="refresh" type="button">Refresh</button></div>
+    </header>
+    <div id="banners"></div>
+
+    <section class="grid kpis" id="kpis" aria-label="Key numbers"></section>
+
+    <section class="grid two">
+      <div class="card"><h2>New users per day</h2><p class="hint">Last 14 days · Apple and Google sign-ups</p><div class="chart" id="signups"></div></div>
+      <div class="card"><h2>AI requests per day</h2><p class="hint">Last 14 days · tap or hover a bar for details</p><div class="chart" id="aicalls"></div></div>
+    </section>
+
+    <section class="grid three">
+      <div class="card"><h2>Where users come from</h2><p class="hint">"How did you hear about Glyde?"</p><div id="sources"></div></div>
+      <div class="card"><h2>Problems this week</h2><p class="hint">Failed requests by reason</p><div id="errors"></div></div>
+      <div class="card"><h2>AI providers this week</h2><p class="hint">Groq is the main AI · OpenAI is the backup</p><div id="providers"></div></div>
+    </section>
+
+    <section class="grid two">
+      <div class="card"><h2>Features</h2><p class="hint">Requests and speed · typical and slowest 5%</p><div id="features"></div></div>
+      <div class="card"><h2>Busiest users today</h2><p class="hint">Bot watch · the daily limit is 30 meal analyses per user</p><div id="top"></div>
+        <h2 style="margin-top:22px">Subscriptions</h2><p class="hint">Status as seen by the server · revenue is in RevenueCat</p><div id="subs"></div></div>
+    </section>
+
+    <section class="card"><h2>Quick links</h2><p class="hint">Everything else lives here</p>
+      <div class="links">
+        <a href="https://app.revenuecat.com" target="_blank" rel="noopener">RevenueCat · revenue</a>
+        <a href="https://appstoreconnect.apple.com/apps/6817789035" target="_blank" rel="noopener">App Store Connect</a>
+        <a href="https://supabase.com/dashboard/project/jpfhesfvbysaxryrurrs" target="_blank" rel="noopener">Supabase</a>
+        <a href="https://console.groq.com/dashboard/usage" target="_blank" rel="noopener">Groq usage</a>
+        <a href="https://platform.openai.com/usage" target="_blank" rel="noopener">OpenAI usage</a>
+        <a href="./" target="_blank" rel="noopener">Landing page</a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+(() => {
+  const ENDPOINT = 'https://jpfhesfvbysaxryrurrs.supabase.co/functions/v1/admin-stats';
+  const STORE = 'glyde.dashboardKey';
+  const $ = (s) => document.querySelector(s);
+  const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fmt = (n) => Number(n || 0).toLocaleString('en-US');
+
+  const FEATURES = { 'analyze-meal': 'Meal analysis', 'coach-chat': 'Coach', transcribe: 'Voice', 'weekly-recap': 'Weekly recap', 'food-photos': 'Meal idea photos' };
+  const ERRORS = {
+    rate_limit: 'Too fast or AI busy', daily_limit: 'Hit the daily limit', monthly_limit: 'Hit the monthly limit',
+    not_food: 'Photo wasn\'t food', no_speech: 'No speech heard', bad_request: 'Bad request (app bug?)',
+    timeout: 'AI timed out', server: 'Server error', bad_response: 'AI reply unreadable', not_subscribed: 'Not subscribed',
+    not_signed_in: 'Not signed in', too_large: 'File too large', unknown: 'Unknown',
+  };
+  const PROVIDERS = { groq: 'Groq', openai: 'OpenAI (backup)', cache: 'Cache (free)', pexels: 'Pexels photos' };
+  const SOURCES = { tiktok: 'TikTok', instagram: 'Instagram', youtube: 'YouTube', facebook: 'Facebook', google: 'Google search', app_store: 'App Store', friend: 'Friend or family', doctor: 'Doctor', other: 'Other' };
+
+  // Key: from #k= in the link (then hidden from the address bar), else saved on this device.
+  let key = null;
+  const hash = new URLSearchParams(location.hash.slice(1)).get('k');
+  if (hash) { key = hash; try { localStorage.setItem(STORE, hash); } catch {} history.replaceState(null, '', location.pathname); }
+  if (!key) { try { key = localStorage.getItem(STORE); } catch {} }
+
+  function showLogin(message) {
+    $('#dash').hidden = true; $('#login').hidden = false;
+    $('#login-error').textContent = message || '';
+  }
+  $('#login-form').addEventListener('submit', (e) => {
+    e.preventDefault(); key = $('#key').value.trim();
+    try { localStorage.setItem(STORE, key); } catch {}
+    load();
+  });
+
+  async function load() {
+    if (!key) return showLogin();
+    $('#login').hidden = true; $('#dash').hidden = false;
+    $('#updated').textContent = 'Loading…';
+    try {
+      const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'x-admin-key': key, 'Content-Type': 'application/json' }, body: JSON.stringify({ tz: Intl.DateTimeFormat().resolvedOptions().timeZone }) });
+      if (res.status === 401) { try { localStorage.removeItem(STORE); } catch {} key = null; return showLogin('That key didn\'t work.'); }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      render(await res.json());
+    } catch (err) {
+      $('#updated').textContent = 'Couldn\'t load: check your internet and refresh.';
+    }
+  }
+
+  function kpi(label, value, sub, chip) {
+    return `<div class="card kpi"><div class="label">${esc(label)}</div><div class="value">${value}</div><div class="sub">${sub}${chip ? ' ' + chip : ''}</div></div>`;
+  }
+  const chip = (kind, text) => `<span class="chip ${kind}"><i></i>${esc(text)}</span>`;
+
+  let last = null;
+  addEventListener('resize', () => { if (last) render(last); });
+  function render(d) {
+    last = d;
+    const today = d.ai_daily[d.ai_daily.length - 1] || { calls: 0, errors: 0, users: 0 };
+    const errRate = today.calls ? today.errors / today.calls : 0;
+    const errChip = today.calls === 0 ? '' : errRate > 0.1 ? chip('bad', Math.round(errRate * 100) + '% failed') : errRate > 0.03 ? chip('warn', Math.round(errRate * 100) + '% failed') : chip('good', 'healthy');
+    const oa = d.openai_today, cap = d.openai_cap;
+    const oaChip = cap && oa / cap > 0.8 ? chip('bad', 'near cap') : cap && oa / cap > 0.5 ? chip('warn', 'watch') : chip('good', 'ok');
+
+    $('#updated').textContent = 'Updated ' + new Date(d.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · ' + d.tz;
+
+    const banners = [];
+    if (d.subscriptions_mode === 'mock') banners.push(`<div class="banner warn" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b>Test mode is on</b>Every signed-in user can use the AI without paying. Switch it off on launch day, before you release the app.</div></div>`);
+    if (cap && oa / cap > 0.8) banners.push(`<div class="banner bad" role="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><div><b>OpenAI backup is near today's cap</b>Groq may be failing or out of free quota. Check Groq usage.</div></div>`);
+    $('#banners').innerHTML = banners.join('');
+
+    $('#kpis').innerHTML = [
+      kpi('New users today', fmt(d.users.today), fmt(d.users.week) + ' this week'),
+      kpi('Total users', fmt(d.users.total), Object.entries(d.users.by_provider).map(([p, n]) => `${esc(p[0].toUpperCase() + p.slice(1))} ${fmt(n)}`).join(' · ') || 'No sign-ups yet'),
+      kpi('Active today', fmt(d.active.today), fmt(d.active.week) + ' this week'),
+      kpi('AI requests today', fmt(today.calls), fmt(d.ai_daily.reduce((s, x) => s + x.calls, 0)) + ' in 14 days'),
+      kpi('Failed today', fmt(today.errors), '', errChip),
+      kpi('OpenAI backup today', fmt(oa) + `<span style="font-size:16px;color:var(--muted);font-weight:500"> / ${fmt(cap)}</span>`, 'daily cap', oaChip),
+    ].join('');
+
+    bars('#signups', d.signups_daily.map((x) => ({ day: x.day, v: x.n, lines: [`<b>${fmt(x.n)}</b> new users`] })));
+    bars('#aicalls', d.ai_daily.map((x) => ({ day: x.day, v: x.calls, lines: [`<b>${fmt(x.calls)}</b> requests`, `${fmt(x.errors)} failed`, `${fmt(x.users)} active users`] })));
+
+    hbars('#sources', d.sources.map((s) => [SOURCES[s.name] || s.name, s.n]), 'No answers yet');
+    hbars('#errors', d.error_kinds.map((e) => [ERRORS[e.kind] || e.kind, e.n]), 'No failures this week');
+    hbars('#providers', d.providers.map((p) => [PROVIDERS[p.name] || p.name, p.n]), 'No AI requests this week');
+
+    $('#features').innerHTML = d.functions.length ? `<table><thead><tr><th>Feature</th><th class="num">Today</th><th class="num">7 days</th><th class="num">Failed</th><th class="num">Typical</th><th class="num">Slowest</th></tr></thead><tbody>${d.functions.map((f) =>
+      `<tr><td>${esc(FEATURES[f.name] || f.name)}</td><td class="num">${fmt(f.calls_today)}</td><td class="num">${fmt(f.calls_7d)}</td><td class="num">${fmt(f.errors_7d)}</td><td class="num">${f.p50_ms == null ? '–' : (f.p50_ms / 1000).toFixed(1) + ' s'}</td><td class="num">${f.p95_ms == null ? '–' : (f.p95_ms / 1000).toFixed(1) + ' s'}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No requests this week</p>';
+
+    $('#top').innerHTML = d.top_users_today.length ? `<table><thead><tr><th>User</th><th class="num">Requests</th><th class="num">Failed</th><th></th></tr></thead><tbody>${d.top_users_today.map((u) =>
+      `<tr><td><code>${esc(u.id)}…</code></td><td class="num">${fmt(u.calls)}</td><td class="num">${fmt(u.errors)}</td><td class="num">${u.calls >= 60 ? chip('bad', 'check') : u.calls >= 30 ? chip('warn', 'heavy') : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">Nobody has used the AI yet today</p>';
+
+    const subs = Object.entries(d.subscriptions);
+    $('#subs').innerHTML = subs.length ? subs.map(([s, n]) => `<div class="hbar" style="grid-template-columns:1fr auto"><span>${chip(s === 'active' ? 'good' : s === 'trialing' ? 'warn' : 'bad', s === 'trialing' ? 'In trial' : s[0].toUpperCase() + s.slice(1))}</span><span class="n">${fmt(n)}</span></div>`).join('') : '<p class="empty">No subscriptions yet</p>';
+  }
+
+  function hbars(sel, rows, emptyText) {
+    const max = Math.max(1, ...rows.map((r) => r[1]));
+    $(sel).innerHTML = rows.length ? rows.map(([label, n]) =>
+      `<div class="hbar"><span>${esc(label)}</span><div class="track"><div class="fill" style="width:${(n / max) * 100}%"></div></div><span class="n">${fmt(n)}</span></div>`).join('') : `<p class="empty">${esc(emptyText)}</p>`;
+  }
+
+  // Single-series bar chart: rounded data-ends, recessive axis, one hover/focus tooltip.
+  const tip = $('#tip');
+  function bars(sel, data) {
+    const el = $(sel);
+    const W = Math.max(280, Math.round(el.clientWidth || 560)), H = 190, top = 14, bottom = 26, left = 4, right = 4;
+    const max = Math.max(1, ...data.map((d) => d.v));
+    const step = (W - left - right) / data.length, bw = Math.max(6, step - 8);
+    const y = (v) => top + (H - top - bottom) * (1 - v / max);
+    const label = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'short' });
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(el.previousElementSibling.previousElementSibling.textContent)}">`;
+    svg += `<line x1="${left}" x2="${W - right}" y1="${H - bottom}" y2="${H - bottom}" stroke="#E9E6DF" stroke-width="1"/>`;
+    data.forEach((d, i) => {
+      const x = left + i * step + (step - bw) / 2;
+      const h = Math.max(d.v ? 3 : 0, H - bottom - y(d.v));
+      const r = Math.min(4, bw / 2, h);
+      svg += `<rect class="hit" x="${left + i * step}" y="${top}" width="${step}" height="${H - top - bottom}" tabindex="0" data-i="${i}"></rect>`;
+      svg += h ? `<path class="barp" d="M${x},${H - bottom} v${-(h - r)} q0,${-r} ${r},${-r} h${bw - 2 * r} q${r},0 ${r},${r} v${h - r} z" fill="${i === data.length - 1 ? '#1D4ED8' : '#5B82EC'}"/>` : '';
+      if ((data.length - 1 - i) % (W < 420 ? 3 : 2) === 0) svg += `<text class="axis" x="${x + bw / 2}" y="${H - 8}" text-anchor="middle">${esc(label(d.day))}</text>`;
+    });
+    svg += '</svg>';
+    const table = `<table class="sr"><tr><th>Day</th><th>Value</th></tr>${data.map((d) => `<tr><td>${esc(d.day)}</td><td>${d.v}</td></tr>`).join('')}</table>`;
+    el.innerHTML = svg + table;
+    const show = (target) => {
+      const d = data[Number(target.dataset.i)];
+      const box = target.getBoundingClientRect();
+      tip.innerHTML = `${esc(label(d.day))}<br>${d.lines.join('<br>')}`;
+      const half = tip.offsetWidth / 2 + 8;
+      tip.style.left = Math.min(Math.max(box.left + box.width / 2, half), innerWidth - half) + scrollX + 'px';
+      tip.style.top = box.top + scrollY + 'px';
+      tip.classList.add('on');
+    };
+    el.querySelectorAll('rect.hit').forEach((r) => {
+      r.addEventListener('pointerenter', () => show(r));
+      r.addEventListener('focus', () => show(r));
+      r.addEventListener('pointerleave', () => tip.classList.remove('on'));
+      r.addEventListener('blur', () => tip.classList.remove('on'));
+    });
+  }
+
+  $('#refresh').addEventListener('click', load);
+  setInterval(() => { if (!document.hidden && key) load(); }, 60000);
+  load();
+})();
+</script>
+</body>
+</html>
