@@ -111,7 +111,8 @@ td.num, th.num { text-align: right; }
     <section class="grid two">
       <div class="card"><h2>Features</h2><p class="hint">Requests and speed · typical and slowest 5%</p><div id="features"></div></div>
       <div class="card"><h2>Busiest users today</h2><p class="hint">Bot watch · the daily limit is 30 meal analyses per user</p><div id="top"></div>
-        <h2 style="margin-top:22px">Subscriptions</h2><p class="hint">Status as seen by the server · revenue is in RevenueCat</p><div id="subs"></div></div>
+        <h2 style="margin-top:22px">Subscriptions</h2><p class="hint">Status as seen by the server · revenue is in RevenueCat</p><div id="subs"></div>
+        <h2 style="margin-top:22px">Launch list</h2><p class="hint">Emails left on the website · tell them on launch day</p><div id="waitlist"></div></div>
     </section>
 
     <section class="card"><h2>Quick links</h2><p class="hint">Everything else lives here</p>
@@ -222,6 +223,8 @@ td.num, th.num { text-align: right; }
       `<tr><td><code>${esc(u.id)}…</code></td><td class="num">${fmt(u.calls)}</td><td class="num">${fmt(u.errors)}</td><td class="num">${u.calls >= 60 ? chip('bad', 'check') : u.calls >= 30 ? chip('warn', 'heavy') : ''}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">Nobody has used the AI yet today</p>';
 
     const subs = Object.entries(d.subscriptions);
+    const wl = d.waitlist || { total: 0, today: 0, week: 0 };
+    $('#waitlist').innerHTML = `<div class="hbar" style="grid-template-columns:1fr auto"><span>Total</span><span class="n">${fmt(wl.total)}</span></div><div class="hbar" style="grid-template-columns:1fr auto"><span>Today</span><span class="n">${fmt(wl.today)}</span></div><div class="hbar" style="grid-template-columns:1fr auto"><span>This week</span><span class="n">${fmt(wl.week)}</span></div>`;
     $('#subs').innerHTML = subs.length ? subs.map(([s, n]) => `<div class="hbar" style="grid-template-columns:1fr auto"><span>${chip(s === 'active' ? 'good' : s === 'trialing' ? 'warn' : 'bad', s === 'trialing' ? 'In trial' : s[0].toUpperCase() + s.slice(1))}</span><span class="n">${fmt(n)}</span></div>`).join('') : '<p class="empty">No subscriptions yet</p>';
   }
 
